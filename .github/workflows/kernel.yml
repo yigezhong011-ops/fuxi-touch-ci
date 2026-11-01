@@ -28,18 +28,21 @@ jobs:
       - name: Host tools
         run: brew install dtc llvm lld 2>/dev/null || true
       - name: Configure
-        run: |
-          ./unixnu defconfig "${{ inputs.defconfig }}" -D ../device
+        run: ./unixnu defconfig "${{ inputs.defconfig }}" -D ../device
       - name: Build kernel
+        env:
+          # prepare-xnu-source.py asks the GitHub API for Apple's source list; without a
+          # token the hosted runner shares an anonymous limit and gets HTTP 403.
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -o pipefail
-          ./unixnu build kernel -D ../device 2>&1 | tail -60
+          ./unixnu build kernel -D ../device 2>&1 | tail -80
       - name: Collect
         if: always()
         run: |
           mkdir -p out
-          find out -name 'kernel.macho' -exec cp {} out/ \; 2>/dev/null || true
-          find out -name 'kernel.json' -exec cp {} out/ \; 2>/dev/null || true
+          find . -name 'kernel.macho' -not -path './.git/*' -exec cp {} out/ \; 2>/dev/null || true
+          find . -name 'kernel.json' -not -path './.git/*' -exec cp {} out/ \; 2>/dev/null || true
           ls -l out || true
       - name: Upload kernel
         if: always()
@@ -56,5 +59,6 @@ jobs:
           name: fuxi-touch-logs
           path: |
             out/**/logs/*.log
+            **/logs/*.log
           if-no-files-found: warn
           retention-days: 7
