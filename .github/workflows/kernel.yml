@@ -1,0 +1,60 @@
+name: build fuxi touch kernel
+
+on:
+  workflow_dispatch:
+    inputs:
+      defconfig:
+        default: fuxi_defconfig
+      device_repository:
+        default: yigezhong011-ops/fuxi-touch
+      device_ref:
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  kernel:
+    runs-on: macos-26
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Check out the device repository
+        run: |
+          git clone --depth 1 --recurse-submodules --branch "${{ inputs.device_ref }}" \
+            "https://github.com/${{ inputs.device_repository }}.git" ../device
+      - name: Host tools
+        run: brew install dtc llvm lld 2>/dev/null || true
+      - name: Configure
+        run: |
+          ./unixnu defconfig "${{ inputs.defconfig }}" -D ../device
+      - name: Build kernel
+        run: |
+          set -o pipefail
+          ./unixnu build kernel -D ../device 2>&1 | tail -60
+      - name: Collect
+        if: always()
+        run: |
+          mkdir -p out
+          find out -name 'kernel.macho' -exec cp {} out/ \; 2>/dev/null || true
+          find out -name 'kernel.json' -exec cp {} out/ \; 2>/dev/null || true
+          ls -l out || true
+      - name: Upload kernel
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuxi-touch-kernel
+          path: out/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuxi-touch-logs
+          path: |
+            out/**/logs/*.log
+          if-no-files-found: warn
+          retention-days: 7

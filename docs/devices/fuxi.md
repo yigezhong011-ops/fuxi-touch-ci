@@ -1,0 +1,27 @@
+# Xiaomi 13 (fuxi)
+
+fuxi is the Xiaomi 13 with the SM8550 SoC. The repositories below are independent community ports. The UniXNU organization does not maintain them.
+
+| Repository | Maintainer |
+| --- | --- |
+| [UniXNU-fuxi](https://github.com/matejkoo217/UniXNU-fuxi) | [matejkoo217](https://github.com/matejkoo217) |
+| [unixnu-fuxi](https://github.com/hanzi123-bilp/unixnu-fuxi) | [hanzi123-bilp](https://github.com/hanzi123-bilp) |
+| [uefi-fuxi](https://github.com/hanzi123-bilp/uefi-fuxi) | [hanzi123-bilp](https://github.com/hanzi123-bilp) |
+| [unixnu-fuxi](https://github.com/Xyvern08371/unixnu-fuxi) | [Xyvern08371](https://github.com/Xyvern08371) |
+| [UniXNU-fuxi](https://github.com/0721GPT/UniXNU-fuxi) | [0721GPT](https://github.com/0721GPT) |
+
+## UniXNU-fuxi
+
+UniXNU-fuxi is a fork of UniXNU-sheng with fuxi board data. It targets the same iPad7,1 iPadOS 17.7.11 image and keeps the sheng kernel prelink. The fuxi UEFI package, prelink, kernel build, touch driver and defconfig are still in progress. The port notes are in `PORTING-FUXI.md`.
+
+## hanzi123-bilp repositories
+
+The `hanzi123-bilp` repositories are a separate device and firmware port. The device repository has a stage A minimal kernel that links before any prelink exists, and a stage B full configuration with 19 archives. The storage audit runs headers-only until live metadata exists; stage B moves UFS to the post-prelink build and the graphics audit accepts only its recorded candidate hash. The firmware repository maps the SM8550 register apertures. No hardware run is documented.
+
+## Maintenance
+
+The maintainer named in the table owns the repository and its release decisions. UniXNU documentation lists the port and its state; it does not take over maintenance.
+
+## Sources
+
+- [Board configuration: 0721GPT/UniXNU-fuxi](https://github.com/0721GPT/UniXNU-fuxi/blob/910abeb231567ab773d427b232c8c1c13b39a051/board.toml)

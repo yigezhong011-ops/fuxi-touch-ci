@@ -1,0 +1,44 @@
+schema_version = 2
+
+[board]
+example = true
+name = "example"
+soc = "SM8550"
+soc_source = "sm8550"
+os_profile = "ipados-17.7.11-21H461"
+description = "Hardware values required"
+kit = "example"
+
+[components]
+include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot"]
+
+[kernel]
+defconfig = "example_defconfig"
+config_fragments = ["arch:configs/common.config", "soc:configs/sm8550.config", "os:configs/ipados.config"]
+patch_series = ["arch:patches/xnu/series", "soc:patches/xnu/series", "os:patches/xnu/series", "device:patches/xnu/series"]
+
+[device_tree]
+source = "device:dts/board.dts"
+include_dirs = ["soc:dts"]
+
+[firmware]
+# Replace with this board's UEFI configuration and paths.
+config = "example"
+dsc = "Platforms/Vendor/examplePkg/example.dsc"
+fd = "Build/examplePkg/{target}_CLANGPDB/FV/SILICIUM_UEFI.fd"
+packages = ["{uefi}", "{tree}/package", "{tree}/drivers/DarwinBoot", "{edk2}"]
+
+[firmware.defines]
+DEVICE_MODEL = "example"
+
+[payload]
+volume = "EXAMPLE"
+size_mib = 192
+loader = "firmware"
+title = "UniXNU"
+kernel_args = ["-v", "serial=3"]
+
+[payload.adt]
+# Supply the board's identity seed through --unique-chip-id.
+chip_id = "207"
+unique_chip_id = "required"
